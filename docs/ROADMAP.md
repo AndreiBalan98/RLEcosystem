@@ -15,13 +15,13 @@ baseline (**11.2×**), and were already at 48.0 (9×) after 1 min, so the assump
 - [x] the result is written here in one sentence, with the numbers and the CPU it ran on
 - [x] if it fails (< 3× random after 20 min): change the plan here — not needed, it passed
 
-## M1 — Setup · status: building
+## M1 — Setup · status: review
 **Outcome:** empty project where every check runs green.
 **Definition of Done:**
-- [ ] `.gitignore` committed before any dependency install (incl. `runs/`)
-- [ ] skeleton + pytest + ruff in place; `.claude/dod-commands` filled with real commands
-- [ ] every DoD command exits 0, and each was shown able to fail
-- [ ] CI runs the DoD commands on push and is green
+- [x] `.gitignore` committed before any dependency install (incl. `runs/`)
+- [x] skeleton + pytest + ruff in place; `.claude/dod-commands` filled with real commands
+- [x] every DoD command exits 0, and each was shown able to fail
+- [x] CI runs the DoD commands on push and is green
 **Out of scope:** any feature code.
 
 ## M2 — Watch blues learn to eat · status: todo

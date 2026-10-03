@@ -1,6 +1,6 @@
 # Spec 001 — M1 setup: an empty project where every check runs green
 
-**Milestone:** M1 · **Status:** approved · **Date:** 2026-10-03
+**Milestone:** M1 · **Status:** done · **Date:** 2026-10-03
 
 ## Goal
 After this, the repo is a real Python project with no features yet: one package, one test folder,
@@ -86,7 +86,20 @@ End-to-end check: the CI run for the PR's last commit is green, and the PR lists
   can't find them, fall back to Python 3.13 in CI and note it here.
 
 ## Needs a decision from the Product Owner
-- [ ] Use **GitHub Actions** for CI on this private repo. It is free up to 2,000 minutes/month on a
+- [x] Use **GitHub Actions** (PO approved 2026-10-03) for CI on this private repo. It is free up to 2,000 minutes/month on a
       private repo; one run here is ≈ 2–4 min (mostly downloading torch), so ~500 pushes/month
       before the free allowance runs out. With GitHub's default $0 spending limit, runs stop
       instead of costing money.
+
+## Result
+- DoD green locally: `ruff check src tests` → "All checks passed!"; `ruff format --check src tests`
+  → "2 files already formatted"; `pytest -q` → "3 passed".
+- Shown red once each (then restored green): unused `import os` → ruff check exit 1 (F401);
+  `__version__   =   "0.1.0"` → ruff format --check exit 1; `draw(7) == draw(8)` → pytest exit 1;
+  the Stop hook run by hand with the unused import → "Definition of Done is NOT met (block 1 of 3)".
+- CI: run 37128390429 green (44 s); deliberate break f3acde0 → run 37128486560 red at
+  "Run every line of .claude/dod-commands"; reverted in 6689554.
+- Changes vs the plan: ruff checks `src tests` instead of `.` (sandbox can't read some `.claude/`
+  files); actions bumped to checkout@v5 / setup-python@v6 after GitHub warned that Node 20 is
+  deprecated.
+- HUMAN TASK done: the PO added the `workflow` permission to the GitHub token so CI files can be pushed.
