@@ -1,0 +1,13 @@
+# Definition of Done — one shell command per line. Every line must exit 0.
+# The Stop hook runs these whenever files changed. Claude fills this in during M1 (setup).
+# Keep it fast (< ~2 min total). Examples — uncomment/replace for your stack:
+#
+# npm run lint
+# npm run typecheck
+# npm test -- --run
+# npm run build
+#
+# ruff check .
+# pytest -q
+#
+# docker build -t app-dod-check .      # "deploy dry-run": what the host will run, run locally
