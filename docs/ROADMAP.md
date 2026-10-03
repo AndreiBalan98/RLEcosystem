@@ -15,7 +15,7 @@ baseline (**11.2×**), and were already at 48.0 (9×) after 1 min, so the assump
 - [x] the result is written here in one sentence, with the numbers and the CPU it ran on
 - [x] if it fails (< 3× random after 20 min): change the plan here — not needed, it passed
 
-## M1 — Setup · status: review
+## M1 — Setup · status: done
 **Outcome:** empty project where every check runs green.
 **Definition of Done:**
 - [x] `.gitignore` committed before any dependency install (incl. `runs/`)
@@ -24,12 +24,12 @@ baseline (**11.2×**), and were already at 48.0 (9×) after 1 min, so the assump
 - [x] CI runs the DoD commands on push and is green
 **Out of scope:** any feature code.
 
-## M2 — Watch blues learn to eat · status: todo
+## M2 — Watch blues learn to eat · status: review (spec 002)
 **Outcome:** one command opens the browser: full-window wrap-around plane, 50 green food, several
 blues learning live with a shared brain. Vision circle show/hide. Speed toggle (watch / fast-forward).
 **Definition of Done (runnable):**
-- [ ] learning test: fixed seed, tiny world, trained blues eat more than random (≤ 2 min)
-- [ ] the world (wheels, wrap-around, vision slices, food respawn) is tested without the browser
+- [x] learning test: fixed seed, tiny world, trained blues eat more than random (≤ 2 min)
+- [x] the world (wheels, wrap-around, vision slices, food respawn) is tested without the browser
 - [ ] HUMAN TASK (2 min): PO runs the start command and confirms he sees blues getting better
 **Out of scope:** live controls, charts, reds.
 

@@ -12,6 +12,7 @@ dependencies = [
     "torch==2.14.1",
     "fastapi==0.142.2",
     "uvicorn==0.54.0",
+    "websockets==17.2",
 ]
 
 [project.optional-dependencies]
@@ -22,6 +23,9 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+rlecosystem = ["static/*"]
 
 [tool.ruff]
 line-length = 100
