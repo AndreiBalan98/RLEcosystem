@@ -108,3 +108,53 @@ and the food/min number went up".
 - [x] New dependency `websockets` — approved 2026-10-03.
 - [x] Hidden worlds train the shared brain — approved 2026-10-03.
 - [x] Approve this spec — approved 2026-10-03.
+
+## Result
+Built on branch `feat/m2-watch-blues`, Intel i7-1255U, 4 torch threads.
+
+**DoD** (all three lines green; 30 tests, 40 s wall-clock):
+```
+$ .venv/bin/ruff check src tests && .venv/bin/ruff format --check src tests && .venv/bin/pytest -q
+All checks passed!
+11 files already formatted
+30 passed in 37.98s
+```
+
+**Learning test** (tiny world 400×300, 10 food, 8 worlds × 2 blues, 40 updates of 64 steps):
+```
+baselines {'uniform random': 16.0, 'untrained (mean)': 9.5, 'untrained (sampled)': 10.0}
+→ trained 57.5 food/min/blue (3.59×)          1 passed in 26.69s
+```
+Probe over seeds 0/1/2 before fixing the settings: 3.59× / 4.06× / 3.62×, so the ≥ 2× bar has margin.
+Shown red once with `LR = 0.0`: `assert 9.5 >= (2 * 16.0)` → 1 failed.
+
+**Server test** shown red once by making `Sim.set_speed` a no-op: `assert 31 > (2 * 31)` → 1 failed.
+Green run: `ticks/s watch 30 fast 233` (tiny world).
+
+**End-to-end** (full world 1600×900, 16 worlds × 5 blues, real uvicorn + websockets client):
+```
+GET / -> 200
+frame keys: ['blues', 'food', 'slices', 'stats', 'world'] | food 50 | blues 5
+blue 0: [964.3, 798.8, -0.469] | its slice 0: [3, 150.0]
+frame size: 2149 bytes
+watch: {'sim_seconds': 5.9, 'food_per_min': 12.2, 'updates': 1, 'speed': 'watch', 'ticks_per_s': 31}
+fast : {'sim_seconds': 52.4, 'food_per_min': 12.6, 'updates': 12, 'speed': 'fast', 'ticks_per_s': 83}
+fast : {'sim_seconds': 103.4, 'food_per_min': 28.6, 'updates': 24, 'speed': 'fast', 'ticks_per_s': 87}
+fast : {'sim_seconds': 155.5, 'food_per_min': 39.0, 'updates': 36, 'speed': 'fast', 'ticks_per_s': 94}
+fast : {'sim_seconds': 208.9, 'food_per_min': 44.0, 'updates': 48, 'speed': 'fast', 'ticks_per_s': 144}
+fast : {'sim_seconds': 263.6, 'food_per_min': 40.6, 'updates': 61, 'speed': 'fast', 'ticks_per_s': 165}
+fast : {'sim_seconds': 315.7, 'food_per_min': 44.4, 'updates': 73, 'speed': 'fast', 'ticks_per_s': 128}
+fast : {'sim_seconds': 364.3, 'food_per_min': 49.0, 'updates': 85, 'speed': 'fast', 'ticks_per_s': 72}
+fast : {'sim_seconds': 419.7, 'food_per_min': 50.6, 'updates': 98, 'speed': 'fast', 'ticks_per_s': 93}
+```
+Food per blue went 12 → 51 per minute in about 2 minutes of fast-forward. Fast-forward runs
+70–165 steps/s on the full world (M0's probe: ~147).
+
+**Differences from the plan, all small:** gradient clipping 0.5 and value-loss weight 0.5 were
+added to PPO (standard values; M0's script no longer exists to compare). In watch mode, the steps
+lost to a PPO update are skipped, not caught up, so the speed reads 28–31 steps/s.
+`spec-reviewer`: no code bugs; it asked for this Result section and a fresh STATE.md (done). From
+its optional notes, a binary or malformed WebSocket message is now ignored instead of logged as an
+error. Food on an edge is drawn half-cut (blues wrap visually, food doesn't): cosmetic, left as is.
+
+**Pending:** HUMAN TASK 2 in STATE.md (the PO watches it for 5 minutes).

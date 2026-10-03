@@ -96,7 +96,7 @@ def create_app(sim: Sim) -> FastAPI:
 
         async def receive() -> None:
             while True:
-                with contextlib.suppress(ValueError):
+                with contextlib.suppress(ValueError, KeyError):  # bad JSON or a binary frame
                     message = json.loads(await ws.receive_text())
                     if isinstance(message, dict):
                         sim.set_speed(message.get("speed"))

@@ -3,58 +3,67 @@
 > Rewritten at the end of every work block. Written for someone returning after **three weeks**.
 
 **Last updated:** 2026-10-03
-**Current milestone:** M2 — Watch blues learn to eat (status: building)
-**Current spec:** `docs/specs/002-m2-watch-blues.md` (approved 2026-10-03)
-**Branch:** `feat/m2-watch-blues`
+**Current milestone:** M2 — Watch blues learn to eat (status: review)
+**Current spec:** `docs/specs/002-m2-watch-blues.md` (built; evidence in its "Result" section)
+**Branch:** `feat/m2-watch-blues` (pushed, PR open)
 
-## HUMAN TASK 1 — install websockets (1 min, blocks M2's server)
-1. In the terminal where Claude Code runs, type exactly:
-   `! .venv/bin/pip install websockets==17.2` and press Enter.
-2. Done looks like: the last line says `Successfully installed websockets-17.2`.
-3. What Claude does next: pins it in `pyproject.toml` and builds the live server on it.
+## HUMAN TASK 2 — watch the blues learn (5 min)
+1. In a normal terminal (not Claude Code), go to the project folder:
+   `cd ~/Personal\ projects/RLEcosystem`
+2. Type `.venv/bin/python -m rlecosystem` and press Enter. The browser opens by itself; if not,
+   open `http://127.0.0.1:8000/` in it.
+3. Watch for about 1 minute: blues wander, the top line says around 10 food/min per blue.
+4. Click **Speed: watch** once (it becomes "fast-forward"). Wait 2–3 minutes.
+5. Click it again to go back to watch. Click **Vision: off** to see the 16 slices; coloured slices
+   are the ones that see something.
+6. Stop the server in the terminal with Ctrl+C.
+- **Pass:** the blues visibly head for food more than at the start, and the food/min number went
+  up (in Claude's headless run: 12 → about 50).
+- **Fail:** anything else, or the page shows "disconnected". Tell Claude what you saw.
+- **What Claude does with it:** pass → you merge the PR, M2 is done. Fail → bug fix with a failing
+  test first.
 
 ## Where we are
-M1 is merged. M2's spec is approved; building has not started. The repo is a Python project with no
-features yet:
-- `pyproject.toml`: pinned dependencies, plus the ruff and pytest settings.
-- `src/rlecosystem/`: an empty package.
-- `tests/test_smoke.py`: checks the imports, that torch is the CPU build, and fixed-seed determinism.
-- `.claude/dod-commands`: ruff check, ruff format --check and pytest, all run on `src tests`.
-- `.github/workflows/ci.yml`: runs every line of `.claude/dod-commands` on every push.
-
-Each check was shown red once on purpose, locally and in CI (run 37128486560). The package is
-installed editable in `.venv`.
+M2 is built: one command opens a live browser view of 5 blues learning to eat with one shared
+brain, plus 15 hidden worlds training the same brain. Code in `src/rlecosystem/`:
+- `world.py`: the vectorised world (wheels, wrap-around, 16-slice vision, food respawn, rewards).
+- `ppo.py`: the in-house PPO brain (policy + value nets, GAE, update).
+- `trainer.py`: 16 worlds × 5 blues → one brain; `snapshot()` of world 0 for the browser;
+  `evaluate()` for fixed-seed scores.
+- `server.py`: FastAPI; the simulation thread (watch = 30 steps/s, fast = as fast as possible),
+  `GET /` and `WS /ws`.
+- `__main__.py`: the start command. `static/`: the canvas page (plain JS).
+Tests: `test_world.py` (physics, vision, eating), `test_ppo.py`, `test_learning.py` (tiny world,
+trained ≥ 2× random, ~25 s), `test_server.py` (real uvicorn + websockets client). DoD ~40 s.
 
 ## Next step
-1. The PO does HUMAN TASK 1.
-2. Claude builds M2 as spec 002 describes: world → brain → trainer → server → page, tests first.
+1. The PO does HUMAN TASK 2, then merges the PR (squash).
+2. M3 (live controls, charts, save / load): plan mode → spec 003.
 
 ## Why the current approach
-CI reads `.claude/dod-commands` instead of repeating the commands, so the Stop hook and CI can't
-drift apart. Ruff only looks at `src tests`. The code lives there, and inside Claude's sandbox some
-`.claude/` files can't be read.
+- Hidden worlds: with only the 5 visible blues learning, watch speed would need ~75 min before they
+  look good; with 16 worlds it takes a few minutes (PO decision).
+- The simulation runs in its own thread and publishes a ready-made JSON frame under a lock; the
+  WebSocket just sends the latest one ~30×/s. The trainer is only touched by that one thread.
+- CI reads `.claude/dod-commands` instead of repeating the commands, so the Stop hook and CI can't
+  drift apart. Ruff only looks at `src tests`.
 
 ## In progress / committed but unfinished
-- Nothing.
+- Nothing besides the open M2 PR.
 
 ## Blocked on the human
-- HUMAN TASK 1 (install websockets).
+- HUMAN TASK 2, then merge the M2 PR.
 
 ## Decisions made since last review
-- `src/` layout, a single `pyproject.toml`, and exact `==` pins of the versions already in `.venv`.
-- CI: GitHub Actions (PO approved; free tier), Ubuntu, Python 3.14, torch from the PyTorch CPU index,
-  checkout@v5 / setup-python@v6. One run takes about 45 s.
-- No type checker for now, because it would be a new dependency.
-- M2 (PO, 2026-10-03): add `websockets==17.2`; 15 hidden worlds train the shared brain next to the
-  visible one.
-- Carried over from M0 as the starting point for M2:
-  - World: 1600×900, 50 food (r 5), 5 blues (r 10), vmax 150 px/s, at most 1 turn/s, dt 1/30 s,
-    vision radius 150 px.
-  - PPO: MLP 80→64→64 tanh, separate value net, log_std init −0.5, γ 0.99, λ 0.95, clip 0.2,
-    lr 3e-4, 16 worlds × 5 blues, 128-step rollouts, 4 epochs × 4 minibatches, entropy 0.001,
-    4 torch threads.
-  - Actions: Gaussian, mapped (x+1)/2 and clipped to [0,1].
-  - The success bar compares against the *better* of two random baselines.
+- M2 (PO, 2026-10-03): added `websockets==17.2`; 15 hidden worlds train the shared brain.
+- World fixed at 1600×900, scaled to fit the window (letterboxed). Server only on 127.0.0.1:8000.
+- PPO also uses gradient clipping 0.5 and value-loss weight 0.5 (standard values).
+- Watch mode skips, instead of catching up, the steps lost to a PPO update: ~28–31 steps/s.
+- Learning test settings: 400×300, 10 food, 8 worlds × 2 blues, 64-step rollouts, 40 updates,
+  bar ≥ 2× the best of three baselines (seeds 0/1/2 gave 3.6–4.1×).
+- Still from M0: vision 150 px, vmax 150 px/s, ≤ 1 turn/s, dt 1/30 s, PPO MLP 80→64→64 tanh,
+  log_std −0.5, γ 0.99, λ 0.95, clip 0.2, lr 3e-4, 4 epochs × 4 minibatches, entropy 0.001,
+  128-step rollouts, 4 torch threads.
 
 ## Tried and rejected — don't retry
 - "Drive at the nearest food" as an efficiency ceiling with several blues: they all chase the same
@@ -64,9 +73,13 @@ drift apart. Ruff only looks at `src tests`. The code lives there, and inside Cl
   `.claude/` files. Use `src tests`.
 
 ## Known debt
-- `gh` inside Claude's sandbox isn't logged in. It shares GitHub's anonymous limit of 60 API calls
-  an hour and can't read CI logs. `git push` works because it uses the stored token. Run
-  `gh run view` sparingly.
-- Learning wobbled at 10 min in M0 (eval 60 → 46 → 61). Consider learning-rate decay or a smaller lr
-  in M2 if the live view shows blues getting worse for a while.
+- Each PPO update (~0.3 s) runs in the simulation thread, so the picture may pause briefly every
+  ~4 s at watch speed. Fix in M3 if it bothers the PO.
+- Food sitting on an edge is drawn cut in half (blues are drawn wrapped, food isn't). Cosmetic.
+- Learning wobbled at 10 min in M0 (eval 60 → 46 → 61). Consider learning-rate decay if the live
+  view shows blues getting worse for a while.
+- `gh` inside Claude's sandbox isn't logged in (anonymous limit 60 API calls/hour, can't read CI
+  logs). `git push` works. Run `gh run view` sparingly.
+- The repo root has untracked empty dotfiles (`.bashrc`, `.idea`, `.mcp.json`, …) created by
+  Claude's sandbox. Not ours; never commit them.
 - Python in `.venv` is 3.14.7 (PRODUCT says 3.12+; fine).
