@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RL Ecosystem</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #05080b; }
+    body { font: 14px/1.4 system-ui, sans-serif; color: #d8dee4; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+    #panel {
+      position: fixed; top: 12px; left: 12px; display: flex; gap: 8px; align-items: center;
+      flex-wrap: wrap; padding: 8px 10px; border-radius: 8px; background: rgba(5, 8, 11, 0.8);
+    }
+    button {
+      font: inherit; color: inherit; background: #1c2630; border: 1px solid #34424f;
+      border-radius: 6px; padding: 4px 10px; cursor: pointer;
+    }
+    button:hover { background: #26333f; }
+    #stats { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+  <canvas id="world"></canvas>
+  <div id="panel">
+    <button id="vision">Vision: off</button>
+    <button id="speed">Speed: watch</button>
+    <span id="stats">connecting…</span>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
