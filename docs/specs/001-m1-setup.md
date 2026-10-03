@@ -28,7 +28,7 @@ purpose, so we know it can catch something.
   import, torch is the CPU build, and a fixed seed gives the same random numbers twice
   (determinism is the base of every learning test later).
 - **DoD = three commands**, run from the repo root against `.venv`:
-  `ruff check .` (lint) · `ruff format --check .` (formatting) · `pytest -q` (tests).
+  `ruff check src tests` (lint) · `ruff format --check src tests` (formatting) · `pytest -q` (tests).
 - **CI:** GitHub Actions, one workflow, Ubuntu, Python 3.14 (matches `.venv`). It creates `.venv`
   the same way as locally, installs, then runs **every line of `.claude/dod-commands`** — CI reads
   that file, so the Stop hook and CI can never drift apart.
@@ -67,8 +67,8 @@ later turn that changes files must keep lint, format and tests green.
 
 ## Definition of Done (commands)
 ```
-.venv/bin/ruff check .
-.venv/bin/ruff format --check .
+.venv/bin/ruff check src tests
+.venv/bin/ruff format --check src tests
 .venv/bin/pytest -q
 ```
 End-to-end check: the CI run for the PR's last commit is green, and the PR lists the four red runs.

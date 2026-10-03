@@ -4,6 +4,12 @@ venv/
 .venv/
 __pycache__/
 *.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Saved brains and chart history
+runs/
 
 # Build output
 dist/
