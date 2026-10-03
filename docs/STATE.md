@@ -3,12 +3,19 @@
 > Rewritten at the end of every work block. Written for someone returning after **three weeks**.
 
 **Last updated:** 2026-10-03
-**Current milestone:** M1 — Setup (status: review)
-**Current spec:** `docs/specs/001-m1-setup.md` (done; evidence in its "Result" section)
-**Branch:** `chore/m1-setup` (pushed)
+**Current milestone:** M2 — Watch blues learn to eat (status: building)
+**Current spec:** `docs/specs/002-m2-watch-blues.md` (approved 2026-10-03)
+**Branch:** `feat/m2-watch-blues`
+
+## HUMAN TASK 1 — install websockets (1 min, blocks M2's server)
+1. In the terminal where Claude Code runs, type exactly:
+   `! .venv/bin/pip install websockets==17.2` and press Enter.
+2. Done looks like: the last line says `Successfully installed websockets-17.2`.
+3. What Claude does next: pins it in `pyproject.toml` and builds the live server on it.
 
 ## Where we are
-M1 is built. The repo is a Python project with no features yet:
+M1 is merged. M2's spec is approved; building has not started. The repo is a Python project with no
+features yet:
 - `pyproject.toml`: pinned dependencies, plus the ruff and pytest settings.
 - `src/rlecosystem/`: an empty package.
 - `tests/test_smoke.py`: checks the imports, that torch is the CPU build, and fixed-seed determinism.
@@ -19,10 +26,8 @@ Each check was shown red once on purpose, locally and in CI (run 37128486560). T
 installed editable in `.venv`.
 
 ## Next step
-1. Claude confirms the CI run for the branch's last commit is green and opens the PR. If `gh` can't
-   create the PR from the sandbox, the PO opens it from the link Claude gives.
-2. The PO merges the PR (squash).
-3. M2 (watch blues learn to eat): plan mode → spec 002.
+1. The PO does HUMAN TASK 1.
+2. Claude builds M2 as spec 002 describes: world → brain → trainer → server → page, tests first.
 
 ## Why the current approach
 CI reads `.claude/dod-commands` instead of repeating the commands, so the Stop hook and CI can't
@@ -30,16 +35,18 @@ drift apart. Ruff only looks at `src tests`. The code lives there, and inside Cl
 `.claude/` files can't be read.
 
 ## In progress / committed but unfinished
-- Nothing besides the open M1 PR.
+- Nothing.
 
 ## Blocked on the human
-- Merge the M1 PR.
+- HUMAN TASK 1 (install websockets).
 
 ## Decisions made since last review
 - `src/` layout, a single `pyproject.toml`, and exact `==` pins of the versions already in `.venv`.
 - CI: GitHub Actions (PO approved; free tier), Ubuntu, Python 3.14, torch from the PyTorch CPU index,
   checkout@v5 / setup-python@v6. One run takes about 45 s.
 - No type checker for now, because it would be a new dependency.
+- M2 (PO, 2026-10-03): add `websockets==17.2`; 15 hidden worlds train the shared brain next to the
+  visible one.
 - Carried over from M0 as the starting point for M2:
   - World: 1600×900, 50 food (r 5), 5 blues (r 10), vmax 150 px/s, at most 1 turn/s, dt 1/30 s,
     vision radius 150 px.
