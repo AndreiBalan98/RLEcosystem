@@ -4,14 +4,16 @@ Status: `todo` → `spec` → `building` → `review` → `done`, plus `cancelle
 why and where the finding is recorded). One milestone in progress at a time.
 Direction changes are edits to this file in a `docs:` commit — never decided in chat only.
 
-## M0 — Can wheeled blues learn to eat fast enough? · status: todo
+## M0 — Can wheeled blues learn to eat fast enough? · status: review
 **Outcome:** a throwaway headless script (no graphics): wrap-around plane, 50 food, a few blues with
 two-wheel steering and 16-slice vision, one shared PPO brain. Trains up to 20 minutes on the PO's CPU
 and prints food eaten per minute: random vs trained, fixed seed. Delete the probe afterwards.
+**Result (2026-10-03, Intel i7-1255U, 4 torch threads):** on a fixed seed (1600×900, 50 food, 5 blues,
+vision 150 px), trained blues ate **58.9 food/min each after 20 min** vs **5.3** for the best random
+baseline (**11.2×**), and were already at 48.0 (9×) after 1 min, so the assumption holds and the plan is unchanged.
 **Definition of Done:**
-- [ ] the result is written here in one sentence, with the numbers and the CPU it ran on
-- [ ] if it fails (< 3× random after 20 min): change the plan here — bigger vision, fewer slices,
-      smaller world, or a longer success bar — before any setup work
+- [x] the result is written here in one sentence, with the numbers and the CPU it ran on
+- [x] if it fails (< 3× random after 20 min): change the plan here — not needed, it passed
 
 ## M1 — Setup · status: todo
 **Outcome:** empty project where every check runs green.
