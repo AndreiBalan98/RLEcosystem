@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  dod:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install (same .venv layout as the laptop)
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.1
+          .venv/bin/pip install -e ".[dev]"
+
+      - name: Run every line of .claude/dod-commands
+        run: |
+          status=0
+          while IFS= read -r cmd || [ -n "$cmd" ]; do
+            cmd="$(echo "$cmd" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+            case "$cmd" in ""|"#"*) continue ;; esac
+            echo "::group::$cmd"
+            bash -c "$cmd" || { echo "::error::FAILED: $cmd"; status=1; }
+            echo "::endgroup::"
+          done < .claude/dod-commands
+          exit $status
