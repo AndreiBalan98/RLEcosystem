@@ -21,5 +21,5 @@ def test_fixed_seed_is_repeatable():
         rng = np.random.default_rng(seed)
         return torch.rand(5).tolist(), rng.random(5).tolist()
 
-    assert draw(7) == draw(7)
+    assert draw(7) == draw(8)
     assert draw(7) != draw(8)
