@@ -1,6 +1,6 @@
 # Spec 000 — M0 probe: can wheeled blues learn to eat fast enough?
 
-**Milestone:** M0 · **Status:** approved · **Date:** 2026-10-03
+**Milestone:** M0 · **Status:** done · **Date:** 2026-10-03
 
 ## Goal
 Settle PRODUCT.md's riskiest assumption with numbers: do blues that steer with two wheels and see
@@ -64,4 +64,30 @@ End-to-end check: the printed table, pasted into the PR, plus one sentence in RO
 - Training speed on a 12-thread laptop CPU limits how many samples 20 minutes buys.
 
 ## Needs a decision from the Product Owner
-- [ ] Only if the bar fails: which plan change (bigger vision, fewer slices, smaller world, longer bar).
+- [x] Only if the bar fails: which plan change — not needed, the bar passed.
+
+## Result
+Run: `.venv/bin/python m0_probe.py --checkpoints 1 2 5 10 15 20` on an Intel i7-1255U, 4 torch threads.
+Food eaten per minute per blue, eval world seed 12345, 3 simulated minutes:
+```
+baseline  random wheels      :   4.20 food/min/blue
+baseline  untrained (mean)   :   3.60
+baseline  untrained (sampled):   5.27
+ceiling   drive-at-nearest   :  26.40
+training: 16 worlds x 5 blues, 128-step rollouts, 4 threads
+train_min  sim_steps  steps/s train_food/min eval_mean eval_sampled
+     1.01       8448      140          41.91     48.00        46.27
+     2.00      17280      144          46.55     52.60        50.87
+     5.01      43648      145          55.05     60.07        57.07
+    10.00      87680      146          41.66     45.87        48.87
+    15.01     132352      147          56.99     60.93        59.33
+    20.01     176000      147          58.90     58.87        59.60
+```
+- **Bar:** 58.87 ÷ 5.27 = **11.2×** at 20 min (≥ 3× needed). Passed at 1 min already (9.1×).
+- **"Ceiling" was mislabelled:** the nearest-food controller scores 89.7 with 1 blue but 26.4 with 5,
+  because all blues chase the same food. It is a weak reference, not a ceiling. Random (4.2) is still
+  far below it, so the metric does tell good from bad driving.
+- **Dip at 10 min** (60 → 46 → 61): ordinary PPO wobble at a fixed learning rate. Recorded as debt.
+- Training speed: ~147 world-steps/s × 80 blues ≈ 11,800 agent-steps/s. 1 training minute ≈ 4.9
+  simulated minutes at watching speed.
+- The probe script was deleted after the run (never committed).
